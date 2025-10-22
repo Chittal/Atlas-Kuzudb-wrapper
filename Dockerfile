@@ -27,12 +27,17 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy application code (excluding database)
+COPY app.py config.py requirements.txt run_server.py ./
+COPY helper/ ./helper/
+COPY routes/ ./routes/
 
 # Create directories for databases and ensure proper permissions
 RUN mkdir -p /app/data /app/static /app/templates && \
     chmod -R 755 /app
+
+# Declare volume for database (still need to mount at runtime)
+VOLUME ["/app/skills_graph.db"]
 
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash app && \

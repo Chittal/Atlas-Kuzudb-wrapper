@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  kuzudb-wrapper:
+    build: .
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./skills_graph.db:/app/skills_graph.db
+    environment:
+      - PORT=8008
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
