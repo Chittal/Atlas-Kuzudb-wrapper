@@ -244,24 +244,28 @@ class KuzuSkillGraph:
 
     def find_learning_path(self, start_skill: str, end_skill: str) -> List[Dict[str, str]]:
         """Find a learning path between two skills using KuzuDB shortest path."""
-        res = self.conn.execute(
-            """
-            MATCH path = (s1:Skill {name: $start_skill})-[:SKILL_CONNECTION*1..10]-(s2:Skill {name: $end_skill})
-            RETURN path
-            ORDER BY length(path)
-            LIMIT 1;
-            """,
-            parameters={"start_skill": start_skill, "end_skill": end_skill}
-        )
-        path: List[Dict[str, str]] = []
-        while res.has_next():
-            row = res.get_next()
-            for node in row[0]["_nodes"]:
-                path.append({"id": node["id"], "name": node["name"]})
-        print("=================================")
-        print("Path objects:", path)
-        print("=================================")
-        return path
+        for N in range(1, 10):
+            res = self.conn.execute(
+                f"""
+                MATCH path = (s1:Skill {{name: $start_skill}})-[:SKILL_CONNECTION*{N}]->(s2:Skill {{name: $end_skill}})
+                RETURN path
+                ORDER BY length(path)
+                LIMIT 1;
+                """,
+                parameters={"start_skill": start_skill, "end_skill": end_skill}
+            )
+            path: List[Dict[str, str]] = []
+            while res.has_next():
+                row = res.get_next()
+                for node in row[0]["_nodes"]:
+                    path.append({"id": node["id"], "name": node["name"]})
+            print("=================================")
+            print("Path objects:", path)
+            print("=================================")
+            if path:
+                print(f"Found path with {N} hops")
+                return path
+        return None
     
     def close(self):
         """Close the database connection."""
