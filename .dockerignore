@@ -59,13 +59,6 @@ README.md
 .env.local
 .env.*.local
 
-# Database files (KuzuDB databases - these should be initialized at runtime)
-*.db
-*.db-shm
-*.db-wal
-skills_graph.db
-*.kuzu
-
 # Raw data and large files
 raw_data/
 data/
